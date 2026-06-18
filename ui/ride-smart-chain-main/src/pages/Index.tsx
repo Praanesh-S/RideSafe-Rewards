@@ -6,42 +6,19 @@ import { ActionButtons } from "@/components/Dashboard/ActionButtons";
 import { Achievements } from "@/components/Dashboard/Achievements";
 import { Bike, Coins, Flame } from "lucide-react";
 import heroBike from "@/assets/hero-bike.jpg";
+import { useEffect, useState } from "react";
+import { emptyDashboard, fetchDashboard, type DashboardData } from "@/lib/ridesafe-api";
 
 const Index = () => {
-  // Data will be fetched from API - currently empty
-  const currentScore = 0;
-  const stats = {
-    totalRides: 0,
-    tokensEarned: 0,
-    currentStreak: 0
-  };
+  const [dashboard, setDashboard] = useState<DashboardData>(emptyDashboard);
 
-  const recentRides: Array<{
-    id: string;
-    date: string;
-    duration: string;
-    distance: string;
-    score: number;
-    tokensEarned: number;
-    route: string;
-  }> = [];
-
-  const leaderboard: Array<{
-    rank: number;
-    rider: string;
-    score: number;
-    tokens: number;
-    rides: number;
-  }> = [];
-
-  const achievements: Array<{
-    id: string;
-    title: string;
-    description: string;
-    icon: "shield" | "flame" | "target" | "zap";
-    unlocked: boolean;
-    progress?: number;
-  }> = [];
+  useEffect(() => {
+    fetchDashboard()
+      .then(setDashboard)
+      .catch((error) => {
+        console.error("Failed to load dashboard:", error);
+      });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -79,26 +56,26 @@ const Index = () => {
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
           <div className="lg:col-span-1 flex justify-center items-start">
             <div className="glass p-8 rounded-2xl">
-              <SafetyScore score={currentScore} />
+              <SafetyScore score={dashboard.currentScore} />
             </div>
           </div>
           
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <StatsCard
               title="Total Rides"
-              value={stats.totalRides}
+              value={dashboard.stats.totalRides}
               icon={Bike}
               color="primary"
             />
             <StatsCard
               title="Tokens Earned"
-              value={stats.tokensEarned}
+              value={dashboard.stats.tokensEarned}
               icon={Coins}
               color="accent"
             />
             <StatsCard
               title="Current Streak"
-              value={`${stats.currentStreak} days`}
+              value={`${dashboard.stats.currentStreak} days`}
               icon={Flame}
               color="secondary"
             />
@@ -106,15 +83,15 @@ const Index = () => {
         </section>
 
         {/* Action Buttons */}
-        <ActionButtons />
+        <ActionButtons onDashboardUpdate={setDashboard} />
 
         {/* Achievements */}
-        {achievements.length > 0 && <Achievements achievements={achievements} />}
+        {dashboard.achievements.length > 0 && <Achievements achievements={dashboard.achievements} />}
 
         {/* Recent Rides and Leaderboard */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <RecentRides rides={recentRides} />
-          <Leaderboard entries={leaderboard} />
+          <RecentRides rides={dashboard.recentRides} />
+          <Leaderboard entries={dashboard.leaderboard} currentUserRank={dashboard.leaderboard.find((entry) => entry.rider === "You")?.rank} />
         </section>
       </main>
 

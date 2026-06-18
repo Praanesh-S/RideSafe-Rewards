@@ -1,15 +1,17 @@
-// This is the code for your frontend (e.g., ActionButtons.tsx)
 import { Button } from "@/components/ui/button";
 import { Upload, Wallet, Gift } from "lucide-react";
 import { toast } from "sonner";
-import { useRef } from "react"; // <-- Make sure this is imported
+import { useRef } from "react";
+import { type DashboardData, uploadRideFile } from "@/lib/ridesafe-api";
 
-export const ActionButtons = () => {
-  // --- NEW CODE ---
+interface ActionButtonsProps {
+  onDashboardUpdate?: (dashboard: DashboardData) => void;
+}
+
+export const ActionButtons = ({ onDashboardUpdate }: ActionButtonsProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
-    // This clicks the hidden file input
     fileInputRef.current?.click();
   };
 
@@ -17,27 +19,14 @@ export const ActionButtons = () => {
     const file = event.target.files?.[0];
 
     if (!file) {
-      return; // User cancelled
+      return;
     }
-
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const formData = new FormData();
-    // This 'rideData' key MUST match the one in your backend multer code
-    formData.append("rideData", file);
 
     const uploadToast = toast.loading("Uploading ride data file...");
 
     try {
-      const response = await fetch(`${backendUrl}/api/score`, {
-        method: 'POST',
-        body: formData, // Send the file
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = await uploadRideFile(file);
+      onDashboardUpdate?.(result.dashboard);
 
       toast.success(`Score calculated: ${result.safetyScore}`, {
         id: uploadToast,
@@ -52,10 +41,8 @@ export const ActionButtons = () => {
       });
     }
 
-    // Clear the input value so the user can upload the same file again
     event.target.value = '';
   };
-  // --- END OF NEW CODE ---
 
   const handleWalletConnect = () => {
     toast.info("Wallet connection coming soon!", {
@@ -71,7 +58,6 @@ export const ActionButtons = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
-      {/* This button now triggers the hidden input */}
       <Button
         size="lg"
         className="w-full h-auto py-6 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg"
@@ -81,13 +67,12 @@ export const ActionButtons = () => {
         Upload Ride Data
       </Button>
 
-      {/* This is the new hidden file input */}
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
         className="hidden"
-        accept=".csv, .json, .txt" // You can change what file types are allowed
+        accept=".csv, .json, .txt"
       />
 
       <Button
