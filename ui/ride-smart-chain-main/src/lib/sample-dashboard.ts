@@ -1,0 +1,80 @@
+import type { DashboardData } from "@/lib/ridesafe-api";
+
+export const sampleDashboard: DashboardData = {
+  currentScore: 92,
+  stats: {
+    totalRides: 5,
+    tokensEarned: 415,
+    currentStreak: 4,
+  },
+  recentRides: [
+    {
+      id: "sample-ride-1",
+      date: "Jun 28, 2026",
+      duration: "42 min",
+      distance: "14.8 km",
+      score: 94,
+      tokensEarned: 91,
+      route: "Koramangala Loop",
+    },
+    {
+      id: "sample-ride-2",
+      date: "Jun 27, 2026",
+      duration: "31 min",
+      distance: "9.6 km",
+      score: 88,
+      tokensEarned: 72,
+      route: "Indiranagar Sprint",
+    },
+    {
+      id: "sample-ride-3",
+      date: "Jun 25, 2026",
+      duration: "58 min",
+      distance: "22.4 km",
+      score: 95,
+      tokensEarned: 104,
+      route: "MG Road Commute",
+    },
+  ],
+  leaderboard: [
+    { rank: 1, rider: "Ava", score: 96, tokens: 3240, rides: 44 },
+    { rank: 2, rider: "You", score: 92, tokens: 415, rides: 5 },
+    { rank: 3, rider: "Dev", score: 91, tokens: 2870, rides: 38 },
+    { rank: 4, rider: "Maya", score: 89, tokens: 2425, rides: 35 },
+    { rank: 5, rider: "Neo", score: 84, tokens: 1950, rides: 27 },
+  ],
+  achievements: [
+    {
+      id: "first-safe-ride",
+      title: "First Safe Ride",
+      description: "Complete one scored ride",
+      icon: "shield",
+      unlocked: true,
+      progress: 100,
+    },
+    {
+      id: "five-ride-streak",
+      title: "Streak Builder",
+      description: "Score 75+ on five rides",
+      icon: "flame",
+      unlocked: false,
+      progress: 80,
+    },
+    {
+      id: "precision-rider",
+      title: "Precision Rider",
+      description: "Reach a 95 safety score",
+      icon: "target",
+      unlocked: true,
+      progress: 100,
+    },
+    {
+      id: "token-surge",
+      title: "Token Surge",
+      description: "Earn 500 SRT",
+      icon: "zap",
+      unlocked: false,
+      progress: 83,
+    },
+  ],
+};

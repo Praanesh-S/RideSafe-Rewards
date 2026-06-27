@@ -7,16 +7,18 @@ import { Achievements } from "@/components/Dashboard/Achievements";
 import { Bike, Coins, Flame } from "lucide-react";
 import heroBike from "@/assets/hero-bike.jpg";
 import { useEffect, useState } from "react";
-import { emptyDashboard, fetchDashboard, type DashboardData } from "@/lib/ridesafe-api";
+import { fetchDashboard, type DashboardData } from "@/lib/ridesafe-api";
+import { sampleDashboard } from "@/lib/sample-dashboard";
 
 const Index = () => {
-  const [dashboard, setDashboard] = useState<DashboardData>(emptyDashboard);
+  const [dashboard, setDashboard] = useState<DashboardData>(sampleDashboard);
 
   useEffect(() => {
     fetchDashboard()
       .then(setDashboard)
       .catch((error) => {
         console.error("Failed to load dashboard:", error);
+        setDashboard(sampleDashboard);
       });
   }, []);
 
@@ -83,7 +85,7 @@ const Index = () => {
         </section>
 
         {/* Action Buttons */}
-        <ActionButtons onDashboardUpdate={setDashboard} />
+        <ActionButtons currentDashboard={dashboard} onDashboardUpdate={setDashboard} />
 
         {/* Achievements */}
         {dashboard.achievements.length > 0 && <Achievements achievements={dashboard.achievements} />}

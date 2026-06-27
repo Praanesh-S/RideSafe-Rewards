@@ -3,12 +3,14 @@ import { Upload, Wallet, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { useRef } from "react";
 import { type DashboardData, uploadRideFile } from "@/lib/ridesafe-api";
+import { calculateLocalDashboard } from "@/lib/ridesafe-local";
 
 interface ActionButtonsProps {
+  currentDashboard?: DashboardData;
   onDashboardUpdate?: (dashboard: DashboardData) => void;
 }
 
-export const ActionButtons = ({ onDashboardUpdate }: ActionButtonsProps) => {
+export const ActionButtons = ({ currentDashboard, onDashboardUpdate }: ActionButtonsProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -34,7 +36,25 @@ export const ActionButtons = ({ onDashboardUpdate }: ActionButtonsProps) => {
       });
 
     } catch (error) {
-      console.error("Failed to upload file:", error);
+      console.error("Failed to upload file to backend:", error);
+
+      if (currentDashboard) {
+        try {
+          const rawText = await file.text();
+          const localResult = calculateLocalDashboard(currentDashboard, file.name, rawText);
+          onDashboardUpdate?.(localResult.dashboard);
+
+          toast.success(`Score calculated (Local Fallback): ${localResult.safetyScore}`, {
+            id: uploadToast,
+            description: `Offline mode: calculated safety score is ${localResult.safetyScore}/100.`
+          });
+          event.target.value = '';
+          return;
+        } catch (fallbackError) {
+          console.error("Local fallback calculation failed:", fallbackError);
+        }
+      }
+
       toast.error("Upload failed.", {
         id: uploadToast,
         description: "Could not process your ride data file."
