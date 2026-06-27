@@ -43,7 +43,7 @@ export const emptyDashboard: DashboardData = {
   achievements: [],
 };
 
-export const apiBaseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+export const apiBaseUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
